@@ -43,12 +43,12 @@ module.exports = (sequelize) => {
       },
       amount: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
-      // exactAmount: {
-      //   type: DataTypes.STRING,
-      //   allowNull: false,
-      // },
+      exactAmount: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       fee: {
         type: DataTypes.STRING,
         allowNull: true,

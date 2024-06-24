@@ -1,6 +1,8 @@
 const models = require("../models/index");
 const { Transactions } = models;
 const { Op } = require("sequelize");
+const Web3 = require('web3');
+const web3 = new Web3('https://empty-muddy-replica.ethereum-sepolia.quiknode.pro/e283e52f6ddd6eb45e91e745c31c5e2913975de0/');
 
 const ethWebhook = async (req, res, next) => {
     try {
@@ -29,6 +31,13 @@ const ethWebhook = async (req, res, next) => {
         const cumulativeGasUsed = parseInt(webhookData.cumulativeGasUsed, 16);
         const fromAddress = webhookData.from.toLowerCase();
 
+        const transactionAmount = await web3.eth.getTransaction(transactionHash);
+
+        if (!transactionAmount) {
+            console.error(`Transaction with hash ${transactionHash} not found on Ethereum`);
+            return res.status(404).send(`Transaction with hash ${transactionHash} not found on Ethereum`);
+        }
+        const valueInEth = web3.utils.fromWei(transactionAmount.value, 'ether');
 
         const now = new Date();
         const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
@@ -59,6 +68,7 @@ const ethWebhook = async (req, res, next) => {
                 transaction.effectiveGasPrice = effectiveGasPrice;
                 transaction.cumulativeGasUsed = cumulativeGasUsed;
                 transaction.fromAddress = fromAddress;
+                transaction.amount = valueInEth;
 
                 await transaction.save();
                 console.log('Transaction updated in database:', transaction.toJSON());
