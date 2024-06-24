@@ -31,16 +31,26 @@ async function createTransactions(req, res) {
         toAddress,
         merchantId,
         customerId,
-        createdAt: { [Op.gte]: tenMinutesAgo }
+        [Op.or]: [
+          {
+            assetId,
+            createdAt: { [Op.gte]: tenMinutesAgo },
+          },
+          {
+            assetId: { [Op.ne]: assetId },
+            createdAt: { [Op.gte]: tenMinutesAgo },
+            status: 'COMPLETED', // Include COMPLETED transactions in the exemption
+          }
+        ],
       },
     });
 
     // Check if there's any transaction with the same assetId in the last 10 minutes
     const sameAssetTransactions = existingTransactions.filter(
-      transaction => transaction.assetId === assetId
+      transaction => transaction.assetId === assetId && transaction.status !== 'COMPLETED'
     );
 
-    // If there's any transaction with the same assetId, block the creation
+    // If there's any transaction with the same assetId (excluding COMPLETED ones), block the creation
     if (sameAssetTransactions.length > 0) {
       return res.status(403).json({
         success: false,
@@ -48,7 +58,7 @@ async function createTransactions(req, res) {
       });
     }
 
-    // If no transactions with the same assetId are found, proceed to create the transaction
+    // If no transactions with the same assetId (excluding COMPLETED ones) are found, proceed to create the transaction
     const createTransaction = await Transactions.create({
       assetId,
       transactionId,
