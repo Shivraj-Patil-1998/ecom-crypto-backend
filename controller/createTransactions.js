@@ -21,53 +21,34 @@ async function createTransactions(req, res) {
     } = req.body;
 
     toAddress = toAddress.toLowerCase();
-   
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
     transactionId = uuidv4();
-    
+
+    // Find all transactions within the last 10 minutes for the given toAddress, merchantId, and customerId
     const existingTransactions = await Transactions.findAll({
       where: {
-        [Op.and]: [
-          { toAddress },
-          { merchantId },
-          { customerId },
-          {
-            [Op.or]: [
-              {
-                [Op.and]: [
-                  { assetId },
-                  { createdAt: { [Op.gte]: tenMinutesAgo } },
-                ],
-              },
-              {
-                [Op.and]: [
-                  { assetId: { [Op.ne]: assetId } },
-                  { createdAt: { [Op.gte]: tenMinutesAgo } },
-                ],
-              },
-            ],
-          },
-        ],
+        toAddress,
+        merchantId,
+        customerId,
+        createdAt: { [Op.gte]: tenMinutesAgo }
       },
     });
 
-    if (existingTransactions.length > 0) {
-     
-      const isAllowed = existingTransactions.some(
-        (transaction) => transaction.assetId !== assetId
-      );
+    // Check if there's any transaction with the same assetId in the last 10 minutes
+    const sameAssetTransactions = existingTransactions.filter(
+      transaction => transaction.assetId === assetId
+    );
 
-      if (!isAllowed) {
-        
-        return res.status(403).json({
-          success: false,
-          message: "Transaction creation blocked. Please wait for 10 minutes.",
-        });
-      }
+    // If there's any transaction with the same assetId, block the creation
+    if (sameAssetTransactions.length > 0) {
+      return res.status(403).json({
+        success: false,
+        message: "Transaction creation blocked. Please wait for 10 minutes.",
+      });
     }
 
-    
+    // If no transactions with the same assetId are found, proceed to create the transaction
     const createTransaction = await Transactions.create({
       assetId,
       transactionId,
