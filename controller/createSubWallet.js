@@ -50,10 +50,19 @@ async function createSubHDwallet(req, res) {
       where: { walletId, customerId }
     });
 
+    const parsedCustomerId = parseInt(customerId, 10);
+    const existingCustomerWallets = await SubWalletAddress.findAll({
+      where: { walletId, customerId: parsedCustomerId }
+    })
+    if (!existingCustomerWallets) {
+      return res.status(404).json({ error: 'Wallets are not found under given merchants' });
+    }
+
     if (existingCustomer) {
-      return res.status(404).json({
-        success: false,
+      return res.json({
+        success: true,
         message: 'Your wallets are already created',
+        existingCustomerWallets: existingCustomerWallets
       });
     }
 
@@ -231,6 +240,7 @@ async function createSubHDwallet(req, res) {
     const createSubWalletAddresses = await SubWalletAddress.bulkCreate(
       newAddresses
     );
+
 
     res.json({
       success: true,
