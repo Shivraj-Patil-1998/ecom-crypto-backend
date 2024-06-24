@@ -4,10 +4,7 @@ const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   class Transactions extends Model {
     static associate(models) {
-      //   this.belongsTo(models.Mnemonic, {
-      //     foreignKey: 'walletId',
-      //     targetKey: 'walletId',
-      //   });
+      // Associations can be defined here
     }
   }
   Transactions.init(
@@ -75,11 +72,11 @@ module.exports = (sequelize) => {
       },
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: Date.now()
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: Date.now()
+        defaultValue: DataTypes.NOW,
       },
       deletedAt: {
         type: DataTypes.DATE,
