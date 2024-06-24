@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 
 async function createTransactions(req, res) {
   try {
-    const {
+    let {
       assetId,
       transactionId,
       transactiontype,
@@ -19,6 +19,7 @@ async function createTransactions(req, res) {
       status,
     } = req.body;
 
+    toAddress = toAddress.toLowerCase();
    
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
