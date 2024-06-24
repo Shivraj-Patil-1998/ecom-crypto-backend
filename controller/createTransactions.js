@@ -60,7 +60,7 @@ async function createTransactions(req, res) {
           transactionId: blockedTransaction.transactionId,
           assetId: blockedTransaction.assetId,
           status: blockedTransaction.status,
-          amount: blockedTransaction.amount
+          amount: blockedTransaction.exactAmount
         }
       });
     }
