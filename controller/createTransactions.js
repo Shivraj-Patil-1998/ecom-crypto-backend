@@ -1,13 +1,13 @@
 const { Op } = require("sequelize");
 const models = require("../models/index");
 const { Transactions } = models;
+const { v4: uuidv4 } = require('uuid');
 
 async function createTransactions(req, res) {
   try {
     // Destructure data from req.body
     let {
       assetId,
-      transactionId,
       transactiontype,
       toAddress,
       exactAmount,
@@ -18,6 +18,9 @@ async function createTransactions(req, res) {
       orderStatus,
       status,
     } = req.body;
+
+    // Generate a UUID for transactionId
+    const transactionId = uuidv4();
 
     // Convert toAddress to lowercase
     toAddress = toAddress.toLowerCase();
