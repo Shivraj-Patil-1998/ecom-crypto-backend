@@ -52,9 +52,16 @@ async function createTransactions(req, res) {
 
     // If there's any transaction with the same assetId (excluding COMPLETED ones), block the creation
     if (sameAssetTransactions.length > 0) {
+      const blockedTransaction = sameAssetTransactions[0];
       return res.status(403).json({
         success: false,
         message: "Transaction creation blocked. Please wait for 10 minutes.",
+        blockedTransaction: {
+          transactionId: blockedTransaction.transactionId,
+          assetId: blockedTransaction.assetId,
+          status: blockedTransaction.status,
+          amount: blockedTransaction.amount
+        }
       });
     }
 
