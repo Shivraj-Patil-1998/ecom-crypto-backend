@@ -2,6 +2,7 @@ require("dotenv").config();
 const models = require("../models/index");
 const { Transactions } = models;
 const { Op } = require("sequelize");
+const { v4: uuidv4 } = require('uuid');
 
 async function createTransactions(req, res) {
   try {
@@ -23,6 +24,7 @@ async function createTransactions(req, res) {
    
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
+    transactionId = uuidv4();
     
     const existingTransactions = await Transactions.findAll({
       where: {
