@@ -66,7 +66,7 @@ const usdtWebhook = async (req, res, next) => {
         console.log("Current time:", now.toISOString());
         console.log("Ten minutes ago:", tenMinutesAgo.toISOString());
 
-        const transactions = await Transactions.findAll({
+        const transactions = await Transactions.findOne({
             where: {
                 toAddress: extractedAddress,
                 assetId: 'USDT_ERC20',
@@ -77,26 +77,24 @@ const usdtWebhook = async (req, res, next) => {
             order: [['createdAt', 'DESC']]
         });
 
-        if (transactions.length > 0) {
-            for (let transaction of transactions) {
-                transaction.transactionHash = transactionHash;
-                transaction.status = status;
-                transaction.orderStatus = orderStatus;
-                transaction.blockNumber = blockNumber;
-                transaction.gasUsed = gasUsed;
-                transaction.effectiveGasPrice = effectiveGasPrice;
-                transaction.cumulativeGasUsed = cumulativeGasUsed;
-                transaction.fromAddress = fromAddress;
-                transaction.amount = valueInEth;
+        if (transactions) {
+            transactions.transactionHash = transactionHash;
+            transactions.status = webhookData.blockNumber !== null ? 'COMPLETED' : 'FAILED';
+            transactions.orderStatus = webhookData.blockNumber !== null ? 'COMPLETED' : 'FAILED';
+            transactions.blockNumber = blockNumber;
+            transactions.gasUsed = gasUsed;
+            transactions.effectiveGasPrice = effectiveGasPrice;
+            transactions.cumulativeGasUsed = cumulativeGasUsed;
+            transactions.fromAddress = fromAddress;
+            transactions.amount = valueInEth;
 
-                await transaction.save();
-                console.log('Transaction updated in database:', transaction.toJSON());
-            }
+            await transactions.save();
+            console.log('Transaction updated in database:', transactions.toJSON());
 
-            res.status(200).send('Webhook received and transactions updated successfully.');
+            res.status(200).send('Webhook received and transaction updated successfully.');
         } else {
             console.log("No recent transactions found");
-            res.status(404).send('No matching transactions found for the given toAddress in the last 10 minutes.');
+            res.status(404).send('No matching transaction found for the given toAddress in the last 10 minutes.');
         }
     } catch (error) {
         console.error('Error updating transaction:', error);
