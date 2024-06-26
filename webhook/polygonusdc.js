@@ -2,7 +2,7 @@ const models = require("../models/index");
 const { Transactions } = models;
 const { Op } = require("sequelize");
 const Web3 = require('web3');
-const web3 = new Web3('https://empty-muddy-replica.ethereum-sepolia.quiknode.pro/e283e52f6ddd6eb45e91e745c31c5e2913975de0/');
+const web3 = new Web3('https://smart-newest-card.matic-amoy.quiknode.pro/1c9bc1924a29f9e51d21315a330dbe3a41f19d6c/');
 
 async function extractAddressAndValue(hexInput) {
     // Remove the '0x' prefix
@@ -35,6 +35,8 @@ const polygonusdcWebhook = async (req, res, next) => {
             return res.status(400).send('Invalid webhook data');
         }
 
+        console.log("webhookData", webhookData)
+
         let toAddress = webhookData.to.toLowerCase(); 
 
         if (!toAddress) {
@@ -51,6 +53,8 @@ const polygonusdcWebhook = async (req, res, next) => {
         const fromAddress = webhookData.from.toLowerCase();
 
         const transactionDetails = await web3.eth.getTransaction(transactionHash);
+
+        console.log("transactionDetails", transactionDetails)
 
         if (!transactionDetails) {
             return res.status(404).send(`Transaction with hash ${transactionHash} not found on Ethereum`);
