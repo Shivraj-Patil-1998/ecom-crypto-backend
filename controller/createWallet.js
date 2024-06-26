@@ -1,17 +1,18 @@
-const bip39 = require('bip39');
-const { HDNode } = require('ethers/lib/utils');
-const bitcoin = require('bitcoinjs-lib');
-const BIP32Factory = require('bip32').default;
-const ecc = require('tiny-secp256k1');
-const TronWeb = require('tronweb');
-var Web3 = require('web3');
-const { ethers } = require('ethers');
-require('dotenv').config();
-const models = require('../models/index');
+const bip39 = require("bip39");
+const { HDNode } = require("ethers/lib/utils");
+const bitcoin = require("bitcoinjs-lib");
+const BIP32Factory = require("bip32").default;
+const ecc = require("tiny-secp256k1");
+const TronWeb = require("tronweb");
+var Web3 = require("web3");
+const { ethers } = require("ethers");
+require("dotenv").config();
+const models = require("../models/index");
 const { WalletName, WalletAddress } = models;
+const { v4: uuidv4 } = require("uuid");
 // const mnemonicGen = `${process.env.MASTER_MNEMONIC}`;
 const mnemonicGen =
-  'wish device moment funny session emerge scare pyramid have impact guitar wonder';
+  "wish device moment funny session emerge scare pyramid have impact guitar wonder";
 const masterNode = ethers.utils.HDNode.fromMnemonic(mnemonicGen);
 
 // const COIN_TYPES = {
@@ -30,10 +31,13 @@ const masterNode = ethers.utils.HDNode.fromMnemonic(mnemonicGen);
 async function createhdwallet(req, res) {
   try {
     const lastWalletName = await WalletName.findOne({
-      order: [['walletId', 'DESC']],
+      order: [["walletId", "DESC"]],
     });
     const lastWalletId = lastWalletName ? lastWalletName.walletId : 0;
     const walletId = lastWalletId + 1;
+
+    const apiKey = uuidv4();
+    const secretKey = uuidv4();
 
     //ETHEREUM
     const pathETH = `m/44'/60'/${walletId}'/0/0`;
@@ -55,14 +59,14 @@ async function createhdwallet(req, res) {
       pubkey: child.publicKey,
       network: bitcoin.networks.testnet,
     });
-    const btcprivateKey = child.privateKey.toString('hex');
-    const btcpublicKey = child.publicKey.toString('hex');
+    const btcprivateKey = child.privateKey.toString("hex");
+    const btcpublicKey = child.publicKey.toString("hex");
 
     //TRON
     const HttpProvider = TronWeb.providers.HttpProvider;
-    const fullNode = new HttpProvider('https://api.trongrid.io');
-    const solidityNode = new HttpProvider('https://api.trongrid.io');
-    const eventServer = new HttpProvider('https://api.trongrid.io');
+    const fullNode = new HttpProvider("https://api.trongrid.io");
+    const solidityNode = new HttpProvider("https://api.trongrid.io");
+    const eventServer = new HttpProvider("https://api.trongrid.io");
     const tronWeb = new TronWeb(fullNode, solidityNode, eventServer);
     const trxResult = tronWeb.fromMnemonic(
       mnemonicGen,
@@ -73,7 +77,7 @@ async function createhdwallet(req, res) {
     const trxAddress = trxResult.address;
 
     //BSC
-    const web3_bsc = new Web3('https://bsc-dataseed1.binance.org:443');
+    const web3_bsc = new Web3("https://bsc-dataseed1.binance.org:443");
     var bscWallet = web3_bsc.eth.accounts.privateKeyToAccount(
       wallet.privateKey
     );
@@ -81,7 +85,7 @@ async function createhdwallet(req, res) {
     const bscAddress = bscWallet.address;
 
     //Polygon
-    const web3_polygon = new Web3('https://polygon-rpc.com');
+    const web3_polygon = new Web3("https://polygon-rpc.com");
     var polygonWallet = web3_polygon.eth.accounts.privateKeyToAccount(
       wallet.privateKey
     );
@@ -95,70 +99,70 @@ async function createhdwallet(req, res) {
         privateKey: ethPrivateKey,
         publicKey: ethPublicKey,
         address: ethAddress,
-        assetId: 'ETH',
+        assetId: "ETH",
       },
       {
         walletId,
         privateKey: btcprivateKey,
         publicKey: btcpublicKey,
         address: address,
-        assetId: 'BTC',
+        assetId: "BTC",
       },
       {
         walletId,
         privateKey: ethPrivateKey,
         publicKey: ethPublicKey,
         address: ethAddress,
-        assetId: 'USDC',
+        assetId: "USDC",
       },
       {
         walletId,
         privateKey: ethPrivateKey,
         publicKey: ethPublicKey,
         address: ethAddress,
-        assetId: 'USDT_ERC20',
+        assetId: "USDT_ERC20",
       },
       {
         walletId,
         privateKey: trxprivateKey,
         publicKey: trxpublicKey,
         address: trxAddress,
-        assetId: 'USDT_TRON',
+        assetId: "USDT_TRON",
       },
       {
         walletId,
         privateKey: trxprivateKey,
         publicKey: trxpublicKey,
         address: trxAddress,
-        assetId: 'USDC_TRON',
+        assetId: "USDC_TRON",
       },
       {
         walletId,
         privateKey: bscprivateKey,
         publicKey: ethPublicKey,
         address: bscAddress,
-        assetId: 'USDC_BSC',
+        assetId: "USDC_BSC",
       },
       {
         walletId,
         privateKey: bscprivateKey,
         publicKey: ethPublicKey,
         address: bscAddress,
-        assetId: 'USDT_BSC',
+        assetId: "USDT_BSC",
       },
       {
         walletId,
         privateKey: polygonprivateKey,
         publicKey: ethPublicKey,
         address: polygonAddress,
-        assetId: 'USDC_POLYGON',
+        assetId: "USDC_POLYGON",
       },
       {
         walletId,
         privateKey: polygonprivateKey,
         publicKey: ethPublicKey,
         address: polygonAddress,
-        assetId: 'USDT_POLYGON',
+        assetId: "USDT_POLYGON",
       },
     ];
 
@@ -176,31 +180,33 @@ async function createhdwallet(req, res) {
 
     const createWalletName = await WalletName.create({
       walletId: walletId,
-      walletName: 'turbo_nodes_wallet_' + walletId,
+      walletName: "turbo_nodes_wallet_" + walletId,
+      apiKey: apiKey,
+      secretKey: secretKey,
     });
 
     const createWalletAddresses = await WalletAddress.bulkCreate(newAddresses);
 
     res.json({
       success: true,
-      message: 'Wallet Name and Wallet Addresses Created Successfully',
+      message: "Wallet Name and Wallet Addresses Created Successfully",
       body: { createWalletName, createWalletAddresses },
     });
   } catch (error) {
-    console.log('failed to create wallet', error);
+    console.log("failed to create wallet", error);
   }
 }
 
 async function getAllWalleName(req, res) {
   try {
     const walletName = await WalletName.findAll({
-      exclude: ['createdAt', 'updatedAt', 'deletedAt'],
+      exclude: ["createdAt", "updatedAt", "deletedAt"],
     });
 
     return res.status(200).json({ walletName });
   } catch (error) {
-    console.error('Failed to get all Wallet Name:', error);
-    return res.status(500).json({ error: 'Failed to get all Wallet Name' });
+    console.error("Failed to get all Wallet Name:", error);
+    return res.status(500).json({ error: "Failed to get all Wallet Name" });
   }
 }
 
@@ -215,13 +221,13 @@ async function getWallet(req, res) {
     });
 
     if (!walletName) {
-      return res.status(404).json({ error: 'Wallet Name not found' });
+      return res.status(404).json({ error: "Wallet Name not found" });
     }
 
     return res.status(200).json({ walletName });
   } catch (error) {
-    console.error('Failed to get Wallet Name:', error);
-    return res.status(500).json({ error: 'Failed to get Wallet Name' });
+    console.error("Failed to get Wallet Name:", error);
+    return res.status(500).json({ error: "Failed to get Wallet Name" });
   }
 }
 

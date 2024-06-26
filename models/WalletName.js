@@ -26,6 +26,14 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      apiKey: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      secretKey: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

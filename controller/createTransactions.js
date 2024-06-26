@@ -55,12 +55,14 @@ async function createTransactions(req, res) {
       const blockedTransaction = sameAssetTransactions[0];
       return res.status(403).json({
         success: false,
-        message: "Transaction creation blocked. Please wait for 10 minutes.",
+        message: "Transaction creation blocked. Please wait",
         blockedTransaction: {
           transactionId: blockedTransaction.transactionId,
           assetId: blockedTransaction.assetId,
           status: blockedTransaction.status,
-          amount: blockedTransaction.exactAmount
+          amount: blockedTransaction.exactAmount,
+          toAddress: blockedTransaction.toAddress, 
+          createdAt: blockedTransaction.createdAt
         }
       });
     }
