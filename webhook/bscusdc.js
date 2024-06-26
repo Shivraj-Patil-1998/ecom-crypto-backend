@@ -34,6 +34,7 @@ const bscusdcWebhook = async (req, res, next) => {
         if (!webhookData) {
             return res.status(400).send('Invalid webhook data');
         }
+        console.log("webhookData",webhookData)
 
         let toAddress = webhookData.to.toLowerCase(); 
 
@@ -51,6 +52,7 @@ const bscusdcWebhook = async (req, res, next) => {
         const fromAddress = webhookData.from.toLowerCase();
 
         const transactionDetails = await web3.eth.getTransaction(transactionHash);
+        console.log("transactionDetails",transactionDetails)
 
         if (!transactionDetails) {
             return res.status(404).send(`Transaction with hash ${transactionHash} not found on Ethereum`);
