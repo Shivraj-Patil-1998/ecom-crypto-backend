@@ -3,8 +3,23 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const app = express();
-app.use(express.json());
+
+const allowedOrigins = ['https://simplileapdigital.com'];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
 app.use(cors());
+app.use(express.json());
+
 const port = 8000;
 const balanceRouter = require('./routes/balance');
 const walletRouter = require('./routes/walletCreation');
@@ -54,8 +69,8 @@ app.use('/webhooks', webhookRoute);
 app.use('/transactions', transactions);
 app.use('/balance', balances);
 app.use('/adminwallets', adminwallets);
-app.use('/customer', customerRoute)
-app.use('/webhook', ethwebhookRoute)
+app.use('/customer', customerRoute);
+app.use('/webhook', ethwebhookRoute);
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
