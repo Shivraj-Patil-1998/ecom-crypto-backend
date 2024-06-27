@@ -17,8 +17,13 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
+
 
 const port = 8000;
 const balanceRouter = require('./routes/balance');
