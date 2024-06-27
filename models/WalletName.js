@@ -34,7 +34,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      domains: {
+      domain: {
         type: DataTypes.STRING,
         allowNull: true,
       },

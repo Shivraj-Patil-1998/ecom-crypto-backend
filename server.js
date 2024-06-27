@@ -9,7 +9,7 @@ const { WalletName, sequelize } = models;
 async function fetchAllowedOrigins() {
   try {
     const wallets = await WalletName.findAll();
-    const domains = wallets.map(wallet => wallet.domains);
+    const domains = wallets.map(wallet => wallet.domain);
     console.log(domains)
     return domains;
   } catch (error) {
