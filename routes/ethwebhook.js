@@ -13,12 +13,13 @@ const router = express.Router();
 router.post('/eth', ethWebhook);
 router.post('/usdc', usdcWebhook);
 router.post('/usdt', usdtWebhook);
-// router.post('/usdctron', ethWebhook);
-// router.post('/usdttron', ethWebhook);
-router.post('/usdcpolygon', polygonusdcWebhook);
-router.post('/usdtpolygon', polygonusdtWebhook);
 router.post('/usdcbsc', bscusdcWebhook);
 router.post('/usdtbsc', bscusdtWebhook);
+router.post('/usdcpolygon', polygonusdcWebhook);
+router.post('/usdtpolygon', polygonusdtWebhook);
+// router.post ('/btc', btcWebhook);
+// router.post('/usdctron', ethWebhook);
+// router.post('/usdttron', ethWebhook);
 // router.post('/eth', ethWebhook);
 
 module.exports = router;

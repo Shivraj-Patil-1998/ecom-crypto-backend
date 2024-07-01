@@ -51,6 +51,10 @@ module.exports = (sequelize) => {
         allowNull: true,
         defaultValue: 0,
       },
+      alertStatus: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

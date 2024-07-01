@@ -50,6 +50,7 @@ fetchAllowedOrigins().then(allowedOrigins => {
   const adminwallets = require('./routes/adminWallets');
   const customerRoute = require('./routes/customerRoute');
   const ethwebhookRoute = require('./routes/ethwebhook');
+  const ethDestination = require('./routes/notificationservice')
 
 
 // async function createWalletTable() {
@@ -84,6 +85,7 @@ fetchAllowedOrigins().then(allowedOrigins => {
   app.use('/adminwallets', adminwallets);
   app.use('/customer', customerRoute);
   app.use('/webhook', ethwebhookRoute);
+  app.use('/notifications', ethDestination)
 
   // Start server
   app.listen(port, () => {

@@ -8,6 +8,9 @@ var Web3 = require("web3");
 const { ethers } = require("ethers");
 require("dotenv").config();
 const models = require("../models/index");
+const { ethupdateAlert, ethusdcupdateAlert } = require("../services/Notifications/Alert/updatealert");
+const { eth_alert_id, usdc_alert_id, usdc_alert_contract, usdt_alert_contract, usdt_alert_id, usdcbsc_alert_contract, usdcbsc_alert_id, usdtbsc_alert_contract, usdtbsc_alert_id, usdcpolygon_alert_id, usdcpolygon_alert_contract, usdtpolygon_alert_contract, usdtpolygon_alert_id } = require("../utils/constant");
+const { padHexString } = require("../utils/helper");
 const { SubWalletName, SubWalletAddress, WalletAddress, WalletName } = models;
 // const mnemonicGen = `${process.env.MASTER_MNEMONIC}`;
 const mnemonicGen =
@@ -99,6 +102,22 @@ async function createSubHDwallet(req, res) {
     const ethPrivateKey = wallet.privateKey;
     const ethPublicKey = wallet.publicKey;
 
+    const ethnotificationId = `${eth_alert_id}`;
+    const ethnotificationExpression = ` || (tx_to == '${ethAddress}')`;
+    const ethnotification = await ethupdateAlert(ethnotificationId, ethnotificationExpression);
+    const ethalertStatus = ethnotification ? true : false;
+    
+    const usdchex = await padHexString(ethAddress)
+    const usdcethalertexpression = ` || ((tx_logs_address == '${usdc_alert_contract}') && (tx_logs_topic2 == '${usdchex}'))`;
+    const usdcnotification = await ethusdcupdateAlert(usdc_alert_id, usdcethalertexpression);
+    const usdcethalertStatus = usdcnotification ? true : false;
+
+    const usdthex = await padHexString(ethAddress)
+    const usdtethalertexpression = ` || ((tx_logs_address == '${usdt_alert_contract}') && (tx_logs_topic2 == '${usdthex}'))`;
+    const usdtnotification = await ethusdcupdateAlert(usdt_alert_id, usdtethalertexpression);
+    const usdtethalertStatus = usdtnotification ? true : false; 
+
+
     //BITCOIN
     const testnet = bitcoin.networks.testnet;
     const seed = await bip39.mnemonicToSeed(mnemonicGen);
@@ -136,6 +155,17 @@ async function createSubHDwallet(req, res) {
     );
     const bscprivateKey = bscWallet.privateKey;
     const bscAddress = bscWallet.address;
+    
+    const bscusdchex = await padHexString(bscAddress)
+    const bscusdcethalertexpression = ` || ((tx_logs_address == '${usdcbsc_alert_contract}') && (tx_logs_topic2 == '${bscusdchex}'))`;
+    const bscusdcnotification = await ethusdcupdateAlert(usdcbsc_alert_id, bscusdcethalertexpression);
+    const bscusdcethalertStatus = bscusdcnotification ? true : false;
+
+    const bscusdthex = await padHexString(bscAddress)
+    const bscusdtethalertexpression = ` || ((tx_logs_address == '${usdtbsc_alert_contract}') && (tx_logs_topic2 == '${bscusdthex}'))`;
+    const bscusdtnotification = await ethusdcupdateAlert(usdtbsc_alert_id, bscusdtethalertexpression);
+    const bscusdtethalertStatus = bscusdtnotification ? true : false; 
+
 
     //Polygon
     const web3_polygon = new Web3("https://polygon-rpc.com");
@@ -144,6 +174,16 @@ async function createSubHDwallet(req, res) {
     );
     const polygonprivateKey = polygonWallet.privateKey;
     const polygonAddress = polygonWallet.address;
+
+    const plyusdchex = await padHexString(polygonAddress)
+    const plyusdcethalertexpression = ` || ((tx_logs_address == '${usdcpolygon_alert_contract}') && (tx_logs_topic2 == '${plyusdchex}'))`;
+    const plyusdcnotification = await ethusdcupdateAlert(usdcpolygon_alert_id, plyusdcethalertexpression);
+    const plyusdcethalertStatus = plyusdcnotification ? true : false;
+
+    const plyusdthex = await padHexString(polygonAddress)
+    const plyusdtethalertexpression = ` || ((tx_logs_address == '${usdtpolygon_alert_contract}') && (tx_logs_topic2 == '${plyusdthex}'))`;
+    const plyusdtnotification = await ethusdcupdateAlert(usdtpolygon_alert_id, plyusdtethalertexpression);
+    const plyusdtethalertStatus = plyusdtnotification ? true : false;
     //End
 
     const subWalletAddresses = [
@@ -155,6 +195,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: ethAddress,
         assetId: "ETH",
+        alertStatus: ethalertStatus
       },
       {
         walletId,
@@ -173,6 +214,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: ethAddress,
         assetId: "USDC",
+        alertStatus: usdcethalertStatus
       },
       {
         walletId,
@@ -182,6 +224,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: ethAddress,
         assetId: "USDT_ERC20",
+        alertStatus: usdtethalertStatus
       },
       {
         walletId,
@@ -209,6 +252,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: bscAddress,
         assetId: "USDC_BSC",
+        alertStatus: bscusdcethalertStatus,
       },
       {
         walletId,
@@ -218,6 +262,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: bscAddress,
         assetId: "USDT_BSC",
+        alertStatus: bscusdtethalertStatus,
       },
       {
         walletId,
@@ -227,6 +272,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: polygonAddress,
         assetId: "USDC_POLYGON",
+        alertStatus: plyusdcethalertStatus
       },
       {
         walletId,
@@ -236,6 +282,7 @@ async function createSubHDwallet(req, res) {
         publicKey: ethPublicKey,
         address: polygonAddress,
         assetId: "USDT_POLYGON",
+        alertStatus: plyusdtethalertStatus
       },
     ];
 
